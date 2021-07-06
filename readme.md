@@ -44,8 +44,10 @@ npm install bsv-wasm @bsvwasm/mnemonic
 Want to contribute? Submit a pull request.
 
 ## TODO:
-- NKFD normalisation
-- BIP39 Array format
+- Integration tests
+- Randomised tests
+- Password tests
+- Larger entropy tests
 
 ## Thanks to
 [u/6511](https://twetch.app/u/6511) / [@firaenix](https://twitter.com/Firaenix)

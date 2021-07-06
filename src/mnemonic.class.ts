@@ -1,16 +1,18 @@
 import { Hash } from 'bsv-wasm'
+import unorm from 'unorm'
+import { Bip39Seed } from './interfaces/bip39seed.interface'
 
 export class Mnemonic {
+    private _password: string = ''
     entropy: string =''
     checksum: string = ''
-    password: string = ''
     mnemonic: string[]
     bits:number = 0
 
     constructor(phrase: string, public words: string[], public spacer: string = ' ') {
         this.mnemonic = phrase.split(this.spacer)
         if(this.mnemonic?.length === 13 || this.mnemonic?.length === 25) {
-            this.password = this.mnemonic?.pop() || '';
+            this._password = this.mnemonic?.pop() || ''
         }
         if(this.mnemonic.length<12) throw new Error("Mnemonic must contain at least 128 bits of entropy")
         if(this.mnemonic.length%3!==0) throw new Error("Mnemonic entropy must be a multiple of 32 bits")
@@ -19,14 +21,23 @@ export class Mnemonic {
             if (n<0) throw new Error(`Invalid word in mnemonic: ${m}`)
             return n.toString(2).padStart(11, '0')
         }).join('')
-        this.checksum = this.entropy.slice(-1*Math.floor(this.entropy.length/33*32));
+        this.checksum = this.entropy.slice(Math.floor(this.entropy.length/33*32));
         this.bits = this.entropy.length - this.checksum.length;
+    }
+
+    get password(): string {
+        return this._password
+    }
+
+    set password(password: string) {
+        this._password = password
     }
 
     static fromBinary(binary: string, words: string[], spacer: string = ' '): Mnemonic {
         return new this(binary.match(/[0-1]{11}/g)?.map((n: string) => { return words[parseInt(n, 2)] }).join(spacer) || '', words, spacer)
     }
     
+    //Takes a >128, 32*n Uint8Array
     static fromBytes(bytes: Uint8Array, words: string[], spacer: string = ' '): Mnemonic {
         if(bytes.length%4!==0 || bytes.length<16) throw new Error("Entropy bytes must be a multiple of 32 bits and no smaller than 128 bits")
         const h = Hash.sha256(bytes).toBytes()
@@ -45,12 +56,11 @@ export class Mnemonic {
     }
 
     toString(): string {
-        return this.mnemonic.join(this.spacer);
+        return this._password ? [...this.mnemonic, this._password].join(this.spacer) : this.mnemonic.join(this.spacer);
     }
 
     toHex(): string {
-        console.log(this.bits);
-        return this.entropy.slice(0,this.bits).match(/[0-1]{8}/g)?.map((n: string) => parseInt(n, 2).toString(16).padStart(2, '0')).join('') || ''
+        return this.entropy.slice(0, this.bits).match(/[0-1]{8}/g)?.map((n: string) => parseInt(n, 2).toString(16).padStart(2, '0')).join('') || ''
     }
 
     toBinary(): string {
@@ -58,10 +68,12 @@ export class Mnemonic {
     }
 
     toBytes(): Uint8Array {
-        return new Uint8Array(this.entropy.match(/[0-1]{8}/g)?.map((n: string) => parseInt(n, 2)) || [])
+        return new Uint8Array(this.entropy.slice(0, this.bits).match(/[0-1]{8}/g)?.map((n: string) => parseInt(n, 2)) || [])
     }
 
-    // toBIP39Seed(): Uint8Array {
-    //     return [this.mnemonic]
-    // }
+    toBIP39Seed(): Bip39Seed {
+        const key = new TextEncoder().encode(unorm.nfkd(this.mnemonic.join(this.spacer)));
+        const salt = new TextEncoder().encode('mnemonic'+unorm.nfkd(this._password))
+        return { key, salt };
+    }
 }
