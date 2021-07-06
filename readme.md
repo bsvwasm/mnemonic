@@ -11,7 +11,7 @@ And export them to:
 - Hex entropy
 - Uint8Array
 - Binary
-- Bip39 Array (Uint8Array object with key and salt for PBKDF derivation)
+- Bip39Seed (Uint8Array object with key and salt for PBKDF derivation)
 
 ## Why not just package this into BSV WASM?
 
