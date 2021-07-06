@@ -11,7 +11,7 @@ And export them to:
 - Hex entropy
 - Uint8Array
 - Binary
-- Bip39 Array (Uint8Array of mnemonic seed + optional passphrase)
+- Bip39 Array (Uint8Array object with key and salt for PBKDF derivation)
 
 ## Why not just package this into BSV WASM?
 
@@ -50,5 +50,7 @@ Want to contribute? Submit a pull request.
 - Larger entropy tests
 
 ## Thanks to
+
 [u/6511](https://twetch.app/u/6511) / [@firaenix](https://twitter.com/Firaenix)
+
 [u/1](https://twetch.app/u/1) / [@hcbeckerich](https://twitter.com/hcbeckerich)
