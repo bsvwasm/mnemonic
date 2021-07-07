@@ -42,7 +42,7 @@ console.log(mnemonic.toHex())
 
 The seed phrase may be any multiple of 3 words with a minimum length of 12 words. Seeds with 13 or 25 words will treat the 13th or 25th word respectively as a passphrase. For any other seed length that you wish to use with a passphrase, you may explicitly set one via the `Mnemonic.passphrase()` method.
 
-### From Hex String
+#### From Hex String
 
 A new `Mnemonic` can be instantiated by any >=128 bit source of entry that is a multiple of 32 bits. To instantiate from a hex `string`, use the `Mnemonic.fromHex()` static method:
 
@@ -56,7 +56,7 @@ console.log(mnemonic.toString())
 // Outputs: えいせい　はんめい　あんこ　はさん　しちりん　ぜんあく　むらさき　かまう　いじょう　まつり　そつえん　いわば
 ```
 
-### From Uint8Array
+#### From Uint8Array
 To instantiate a new `Mnemonic` from a `Uint8Array` with the same constraints as a hex stringe above, use the `Mnemonic.fromBytes()` static method:
 
 ```ts
