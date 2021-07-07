@@ -3,7 +3,7 @@ import unorm from 'unorm'
 import { Bip39Seed } from './interfaces/bip39seed.interface'
 
 export class Mnemonic {
-    private _password: string = ''
+    private _passphrase: string = ''
     entropy: string =''
     checksum: string = ''
     mnemonic: string[]
@@ -12,7 +12,7 @@ export class Mnemonic {
     constructor(phrase: string, public words: string[], public spacer: string = ' ') {
         this.mnemonic = phrase.split(this.spacer)
         if(this.mnemonic?.length === 13 || this.mnemonic?.length === 25) {
-            this._password = this.mnemonic?.pop() || ''
+            this._passphrase = this.mnemonic?.pop() || ''
         }
         if(this.mnemonic.length<12) throw new Error("Mnemonic must contain at least 128 bits of entropy")
         if(this.mnemonic.length%3!==0) throw new Error("Mnemonic entropy must be a multiple of 32 bits")
@@ -25,19 +25,25 @@ export class Mnemonic {
         this.bits = this.entropy.length - this.checksum.length;
     }
 
-    get password(): string {
-        return this._password
+    getPassphrase(): string {
+        return this._passphrase
     }
 
-    set password(password: string) {
-        this._password = password
+    setPassphrase(passphrase: string) {
+        this._passphrase = passphrase
     }
 
     static fromBinary(binary: string, words: string[], spacer: string = ' '): Mnemonic {
+        if(binary.length%33!==0) {
+            if(binary.length%32!==0) {
+                throw new Error("Entropy bits must be a multiple of 32 bits, or 33 bits with a checksum, and no smaller than 128 bits in length")
+            }
+            const bytes = new Uint8Array(binary.match(/[0-1]{8}/g)?.map((n: string) => parseInt(n, 2)) || [])
+            return this.fromBytes(bytes, words, spacer)
+        }
         return new this(binary.match(/[0-1]{11}/g)?.map((n: string) => { return words[parseInt(n, 2)] }).join(spacer) || '', words, spacer)
     }
     
-    //Takes a >128, 32*n Uint8Array
     static fromBytes(bytes: Uint8Array, words: string[], spacer: string = ' '): Mnemonic {
         if(bytes.length%4!==0 || bytes.length<16) throw new Error("Entropy bytes must be a multiple of 32 bits and no smaller than 128 bits")
         const h = Hash.sha256(bytes).toBytes()
@@ -56,7 +62,7 @@ export class Mnemonic {
     }
 
     toString(): string {
-        return this._password ? [...this.mnemonic, this._password].join(this.spacer) : this.mnemonic.join(this.spacer);
+        return this._passphrase ? [...this.mnemonic, this._passphrase].join(this.spacer) : this.mnemonic.join(this.spacer);
     }
 
     toHex(): string {
@@ -73,7 +79,7 @@ export class Mnemonic {
 
     toBIP39Seed(): Bip39Seed {
         const key = new TextEncoder().encode(unorm.nfkd(this.mnemonic.join(this.spacer)));
-        const salt = new TextEncoder().encode('mnemonic'+unorm.nfkd(this._password))
+        const salt = new TextEncoder().encode('mnemonic'+unorm.nfkd(this._passphrase))
         return { key, salt };
     }
 }

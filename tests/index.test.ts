@@ -233,6 +233,5 @@ describe('NFKD Normalisation', function () {
 		const mnemonic = MnemonicJA.fromBytes(entropy).toBIP39Seed()
 		assert.equal(key.toString(), mnemonic.key.toString())
 		assert.equal(salt.toString(), mnemonic.salt.toString())
-		// console.log(mnemonic.salt.toString())
 	});
 });
