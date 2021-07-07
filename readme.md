@@ -125,4 +125,5 @@ Want to contribute? Submit a pull request.
 ## Thanks to
 
 [u/6511](https://twetch.app/u/6511) / [@firaenix](https://twitter.com/Firaenix)
+
 [u/1](https://twetch.app/u/1) / [@hcbeckerich](https://twitter.com/hcbeckerich)
