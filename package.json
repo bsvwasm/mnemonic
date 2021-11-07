@@ -1,6 +1,6 @@
 {
   "name": "@bsvwasm/mnemonic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Convert a Mnemonic to a BIP39 seed for use in bsv-wasm",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
